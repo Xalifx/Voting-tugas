@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pemilihan Dewan Siswa</title>
+    <style>
+        body {
+            background: linear-gradient(to bottom, #e0f7fa, #ffffff);
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+            position: relative;
+        }
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 80%;
+        }
+        h1 {
+            color: #00796b;
+        }
+        .candidates {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+        .candidate {
+            padding: 15px;
+            border: 1px solid #00796b;
+            border-radius: 5px;
+            transition: background 0.3s;
+            width: 30%;
+        }
+        .candidate:hover {
+            background: #b2dfdb;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #00796b;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background-color: #004d40;
+        }
+        .results {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #00796b;
+            border-radius: 5px;
+            background: #ffffff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .footer {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+        }
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            border-radius: 10px;
+            background: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        .popup.show {
+            display: block;
+            opacity: 1;
+        }
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 18px;
+            color: #00796b;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Pilih Calon Anda</h1>
+        <div class="candidates">
+            <div class="candidate" id="candidate1">
+                <h2>Calon 1</h2>
+                <p>Deskripsi calon 1 di sini.</p>
+                <button onclick="vote('candidate1')">Suara</button>
+                <button onclick="removeVote('candidate1')">Hapus Suara</button>
+            </div>
+            <div class="candidate" id="candidate2">
+                <h2>Calon 2</h2>
+                <p>Deskripsi calon 2 di sini.</p>
+                <button onclick="vote('candidate2')">Suara</button>
+                <button onclick="removeVote('candidate2')">Hapus Suara</button>
+            </div>
+            <div class="candidate" id="candidate3">
+                <h2>Calon 3</h2>
+                <p>Deskripsi calon 3 di sini.</p>
+                <button onclick="vote('candidate3')">Suara</button>
+                <button onclick="removeVote('candidate3')">Hapus Suara</button>
+            </div>
+        </div>
+        <div class="results" id="results">
+            <h2>Hasil Suara</h2>
+            <p>Calon 1: <span id="count1">0</span> suara</p>
+            <p>Calon 2: <span id="count2">0</span> suara</p>
+            <p>Calon 3: <span id="count3">0</span> suara</p>
+        </div>
+        <button onclick="endVoting()">Akhiri Pemungutan Suara</button>
+    </div>
+
+    <div class="footer">
+        <button onclick="toggleResults()">Tampilkan Hasil</button>
+    </div>
+
+    <div class="popup" id="popup">
+        <button class="close-btn" onclick="closePopup()">×</button>
+        <p id="popupMessage"></p>
+    </div>
+
+    <div class="popup" id="winnerPopup">
+        <button class="close-btn" onclick="closeWinnerPopup()">×</button>
+        <h2 id="winnerMessage"></h2>
+    </div>
+
+    <script>
+        const votes = { candidate1: 0, candidate2: 0, candidate3: 0 };
+
+        function vote(candidate) {
+            votes[candidate]++;
+            updateResults();
+            showPopup(`Kamu memilih ${candidate.charAt(0).toUpperCase() + candidate.slice(1)}`);
+        }
+
+        function removeVote(candidate) {
+            if (votes[candidate] > 0) {
+                votes[candidate]--;
+                updateResults();
+            }
+        }
+
+        function updateResults() {
+            document.getElementById('count1').innerText = votes.candidate1;
+            document.getElementById('count2').innerText = votes.candidate2;
+            document.getElementById('count3').innerText = votes.candidate3;
+        }
+
+        function toggleResults() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.style.display = resultsDiv.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function endVoting() {
+            const winner = Object.keys(votes).reduce((a, b) => votes[a] > votes[b] ? a : b);
+            document.getElementById('winnerMessage').innerText = `Pemenang: ${winner.charAt(0).toUpperCase() + winner.slice(1)}! Selamat!`;
+            showWinnerPopup();
+        }
+
+        function showPopup(message) {
+            const popup = document.getElementById('popup');
+            document.getElementById('popupMessage').innerText = message;
+            popup.classList.add('show');
+            setTimeout(() => popup.classList.remove('show'), 3000);
+        }
+
+        function showWinnerPopup() {
+            const winnerPopup = document.getElementById('winnerPopup');
+            winnerPopup.classList.add('show');
+        }
+
+        function closePopup() {
+            const popup = document.getElementById('popup');
+            popup.classList.remove('show');
+        }
+
+        function closeWinnerPopup() {
+            const winnerPopup = document.getElementById('winnerPopup');
+            winnerPopup.classList.remove('show');
+        }
+    </script>
+
+</body>
+</html>
